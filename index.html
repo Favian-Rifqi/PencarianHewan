@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulator Kecocokan Cinta 💖</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Canvas Confetti untuk efek kemenangan -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap');
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+    .heart-bg {
+      background-image: radial-gradient(#f472b6 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    @keyframes pulse-slow {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    .animate-pulse-slow {
+      animation: pulse-slow 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-rose-50 text-slate-800 min-h-screen flex items-center justify-center p-4 heart-bg">
+
+  <!-- CARD UTAMA -->
+  <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-6 sm:p-10 max-w-md w-full border border-rose-100 relative overflow-hidden">
+    
+    <!-- Dekorasi Hati -->
+    <div class="absolute -top-10 -right-10 w-28 h-28 bg-rose-200 rounded-full blur-2xl opacity-60"></div>
+    <div class="absolute -bottom-10 -left-10 w-28 h-28 bg-pink-200 rounded-full blur-2xl opacity-60"></div>
+
+    <!-- Header -->
+    <div class="text-center mb-8 relative z-10">
+      <div class="inline-flex items-center justify-center p-4 bg-rose-100 text-rose-600 rounded-full mb-3 animate-pulse-slow shadow-inner">
+        <i data-lucide="heart" class="w-10 h-10 fill-rose-500 stroke-rose-600"></i>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-rose-600 tracking-tight">Kalkulator Cinta</h1>
+      <p class="text-xs sm:text-sm text-slate-500 mt-1">Cek berapa persen kecocokan kamu & pasanganmu!</p>
+    </div>
+
+    <!-- FORM INPUT NAMA -->
+    <div class="space-y-4 relative z-10">
+      <!-- Nama Pertama -->
+      <div>
+        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+          <i data-lucide="user" class="w-4 h-4 text-rose-500"></i> Nama Kamu
+        </label>
+        <input 
+          type="text" 
+          id="name1" 
+          placeholder="Contoh: Rizki" 
+          class="w-full px-4 py-3 bg-rose-50/50 border border-rose-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-rose-400 focus:bg-white transition font-medium text-slate-700 placeholder-slate-400"
+        >
+      </div>
+
+      <!-- Ikon Tanda Tambah / Cinta -->
+      <div class="flex justify-center -my-2">
+        <div class="bg-rose-500 text-white p-2 rounded-full shadow-md z-10">
+          <i data-lucide="heart-handshake" class="w-5 h-5"></i>
+        </div>
+      </div>
+
+      <!-- Nama Kedua -->
+      <div>
+        <label class="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+          <i data-lucide="user-heart" class="w-4 h-4 text-rose-500"></i> Nama Pasangan / Gebetan
+        </label>
+        <input 
+          type="text" 
+          id="name2" 
+          placeholder="Contoh: Dia" 
+          class="w-full px-4 py-3 bg-rose-50/50 border border-rose-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-rose-400 focus:bg-white transition font-medium text-slate-700 placeholder-slate-400"
+        >
+      </div>
+
+      <!-- Tombol Cek -->
+      <button 
+        onclick="calculateLove()" 
+        class="w-full mt-4 bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg shadow-rose-200 hover:shadow-rose-300 transition-all transform active:scale-95 flex items-center justify-center gap-2"
+      >
+        <i data-lucide="sparkles" class="w-5 h-5"></i> Hitung Kecocokan!
+      </button>
+    </div>
+
+    <!-- HASIL RATING (Tersembunyi secara default) -->
+    <div id="resultBox" class="hidden mt-8 pt-6 border-t border-rose-100 text-center relative z-10 animate-fade-in">
+      <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Tingkat Kecocokan</h3>
+      
+      <!-- Angka Persentase -->
+      <div class="text-5xl font-black text-rose-600 mb-3 flex items-center justify-center gap-1">
+        <span id="scoreText">0</span>%
+      </div>
+
+      <!-- Indikator Baris Hati (Love Rating Visual) -->
+      <div class="flex justify-center gap-1.5 mb-4 text-rose-500" id="heartRating">
+        <!-- Hati visual diisi oleh JS -->
+      </div>
+
+      <!-- Pesan / Catatan Kecocokan -->
+      <div class="bg-rose-50 border border-rose-100 rounded-2xl p-4">
+        <p id="commentText" class="text-sm font-semibold text-rose-800 leading-relaxed"></p>
+      </div>
+
+      <!-- Tombol Coba Lagi -->
+      <button 
+        onclick="resetForm()" 
+        class="mt-4 text-xs font-bold text-slate-400 hover:text-rose-500 transition underline flex items-center justify-center gap-1 mx-auto"
+      >
+        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Coba Nama Lain
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    // Inisialisasi Ikon Lucide
+    lucide.createIcons();
+
+    function calculateLove() {
+      const name1 = document.getElementById('name1').value.trim();
+      const name2 = document.getElementById('name2').value.trim();
+
+      if (!name1 || !name2) {
+        alert('Mohon isi kedua nama terlebih dahulu!');
+        return;
+      }
+
+      // Algoritma Konsisten Berdasarkan Karakter Nama (Bukan Random Acak)
+      const combined = (name1 + name2).toLowerCase().replace(/\s+/g, '');
+      let sum = 0;
+      for (let i = 0; i < combined.length; i++) {
+        sum += combined.charCodeAt(i);
+      }
+      
+      // Menghasilkan nilai 35% - 99% agar hasil selalu menyenangkan
+      const percentage = (sum % 65) + 35;
+
+      // Tampilkan Hasil
+      const resultBox = document.getElementById('resultBox');
+      const scoreText = document.getElementById('scoreText');
+      const heartRating = document.getElementById('heartRating');
+      const commentText = document.getElementById('commentText');
+
+      resultBox.classList.remove('hidden');
+
+      // Animasi Angka Hitung
+      let currentScore = 0;
+      const interval = setInterval(() => {
+        if (currentScore >= percentage) {
+          clearInterval(interval);
+          scoreText.innerText = percentage;
+          
+          // Efek Kembang Api Confetti jika persentase tinggi (>75%)
+          if (percentage >= 75) {
+            confetti({
+              particleCount: 80,
+              spread: 60,
+              origin: { y: 0.7 }
+            });
+          }
+        } else {
+          currentScore++;
+          scoreText.innerText = currentScore;
+        }
+      }, 20);
+
+      // Render Visual Hati (Love Rating 1-5 Bintang/Hati)
+      const heartCount = Math.round((percentage / 100) * 5);
+      heartRating.innerHTML = '';
+      for (let i = 1; i <= 5; i++) {
+        if (i <= heartCount) {
+          heartRating.innerHTML += `<i data-lucide="heart" class="w-6 h-6 fill-rose-500 stroke-rose-500"></i>`;
+        } else {
+          heartRating.innerHTML += `<i data-lucide="heart" class="w-6 h-6 text-rose-200"></i>`;
+        }
+      }
+      lucide.createIcons();
+
+      // Komentar / Keterangan Kecocokan
+      if (percentage >= 85) {
+        commentText.innerText = `Pasangan Serasi! ${name1} & ${name2} ditakdirkan untuk bersama! 💕✨`;
+      } else if (percentage >= 70) {
+        commentText.innerText = `Sangat Cocok! Ada ikatan batin yang kuat antara ${name1} & ${name2}. 💖`;
+      } else if (percentage >= 50) {
+        commentText.innerText = `Cukup Cocok! Butuh sedikit usaha & komunikasi agar ${name1} & ${name2} makin dekat. 😊`;
+      } else {
+        commentText.innerText = `Saling Melengkapi! Perbedaan ${name1} & ${name2} justru membuat hubungan makin menarik! 😉`;
+      }
+    }
+
+    function resetForm() {
+      document.getElementById('name1').value = '';
+      document.getElementById('name2').value = '';
+      document.getElementById('resultBox').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
